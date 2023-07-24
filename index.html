@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>API Data Display</title>
+  </head>
+  <body>
+    <h1>API Data Display</h1>
+    <div id="data"></div>
+
+    <script>
+      const apiKey = "YOUR_API_KEY"; // Replace this with your actual API key
+
+      // Function to fetch data from the API
+      async function fetchDataFromAPI() {
+        try {
+          const apiUrl = "https://dy-api.com/v2/serve/user/choose";
+          const response = await fetch(apiUrl, {
+            headers: {
+              Authorization: `Bearer ${apiKey}`,
+            },
+          });
+          const data = await response.json();
+          displayData(data);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      }
+
+      // Function to display the data on the page
+      function displayData(data) {
+        const dataDiv = document.getElementById("data");
+
+        // Assuming the API response contains the "data" object with various properties
+        const image = data.data.image;
+        const title = data.data.title;
+        const subtitle = data.data.subtitle;
+        const cta = data.data.cta;
+        const link = data.data.link;
+
+        // Update the HTML content with the API data
+        dataDiv.innerHTML = `
+                <img src="${image}" alt="Image">
+                <h2>${title}</h2>
+                <h3>${subtitle}</h3>
+                <a href="${link}" target="_blank">${cta}</a>
+            `;
+      }
+
+      // Fetch data from the API when the page loads
+      fetchDataFromAPI();
+    </script>
+  </body>
+</html>
