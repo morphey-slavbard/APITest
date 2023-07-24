@@ -1,56 +1,65 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>API Data Display</title>
-  </head>
-  <body>
-    <h1>API Data Display</h1>
-    <div id="data"></div>
+const request = require("request");
 
-    <script>
-      const apiKey = "308f1d6aee34e3ccca2d400f40f2318ab1b52757e7301efcbeedc5e17b756cf2"; // Replace this with your actual API key
+const options = {
+  method: 'POST',
+  url: 'https://dy-api.com/v2/serve/user/choose',
+  headers: {
+    'content-type': 'application/json',
+    'dy-api-key': '308f1d6aee34e3ccca2d400f40f2318ab1b52757e7301efcbeedc5e17b756cf2' // Replace with your actual API key
+  },
+  body: JSON.stringify({
+    user: {
+      id: ""
+    },
+    session: { custom: "" },
+    selector: { names: ["Home Page Top Banner"] },
+    context: {
+      page: {
+        type: "HOMEPAGE",
+        data: [""],
+        location: "https://my-site.com",
+        locale: "en_US"
+      },
+      pageAttributes: { is_night: "true" }
+    },
+    options: { isImplicitPageview: true }
+  })
+};
 
-      // Function to fetch data from the API
-      async function fetchDataFromAPI() {
-        try {
-          const apiUrl = "https://direct.dy-api.eu/v2/serve/user/choose";
-          const response = await fetch(apiUrl, {
-            headers: {
-              Authorization: `Bearer ${apiKey}`,
-            },
-          });
-          const data = await response.json();
-          console.log(data);
-          displayData(data);
-        } catch (error) {
-          console.error("Error fetching data:", error);
-        }
-      }
+request(options, function (error, response, body) {
+  if (error) {
+    console.error('Error making API call:', error);
+    return;
+  }
 
-      // Function to display the data on the page
-      function displayData(data) {
-        const dataDiv = document.getElementById("data");
+  // Parse the JSON response from the API
+  const data = JSON.parse(body);
 
-        // Assuming the API response contains the "data" object with various properties
-        const image = data.data.image;
-        const title = data.data.title;
-        const subtitle = data.data.subtitle;
-        const cta = data.data.cta;
-        const link = data.data.link;
+  // Render the results in an HTML document
+  renderResultsInHTML(data);
+});
 
-        // Update the HTML content with the API data
-        dataDiv.innerHTML = `
-                <img src="${image}" alt="Image">
-                <h2>${title}</h2>
-                <h3>${subtitle}</h3>
-                <a href="${link}" target="_blank">${cta}</a>
-            `;
-      }
+function renderResultsInHTML(data) {
+  // Create the HTML content based on the received data
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>API Results</title>
+    </head>
+    <body>
+        <h1>API Results</h1>
+        <pre>${JSON.stringify(data, null, 2)}</pre>
+    </body>
+    </html>
+  `;
 
-      // Fetch data from the API when the page loads
-      fetchDataFromAPI();
-    </script>
-  </body>
-</html>
+  // Save the HTML content to a file (e.g., results.html)
+  const fs = require('fs');
+  fs.writeFileSync('results.html', htmlContent);
+
+  console.log('HTML document generated: results.html');
+}
+
