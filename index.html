@@ -6,60 +6,65 @@ const options = {
   headers: {
     'content-type': 'application/json',
     'dy-api-key': '308f1d6aee34e3ccca2d400f40f2318ab1b52757e7301efcbeedc5e17b756cf2' // Replace with your actual API key
-  },
-  body: JSON.stringify({
-    user: {
-      id: ""
-    },
-    session: { custom: "" },
-    selector: { names: ["Home Page Top Banner"] },
-    context: {
-      page: {
-        type: "HOMEPAGE",
-        data: [""],
-        location: "https://my-site.com",
-        locale: "en_US"
-      },
-      pageAttributes: { is_night: "true" }
-    },
-    options: { isImplicitPageview: true }
-  })
-};
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Data Display</title>
+</head>
+<body>
+    <h1>API Data Display</h1>
+    <div id="data"></div>
 
-request(options, function (error, response, body) {
-  if (error) {
-    console.error('Error making API call:', error);
-    return;
-  }
+    <script>
+        // Function to fetch data from the API using POST
+        async function fetchDataFromAPI() {
+            const apiUrl = 'https://dy-api.eu/v2/serve/user/choose';
+            const apiKey = '308f1d6aee34e3ccca2d400f40f2318ab1b52757e7301efcbeedc5e17b756cf2'; // Replace this with your actual API key
 
-  // Parse the JSON response from the API
-  const data = JSON.parse(body);
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'dy-api-key': apiKey
+                    },
+                    body: JSON.stringify({
+                        user: {
+                            id: ""
+                        },
+                        session: { custom: "" },
+                        selector: { names: ["Home Page Top Banner"] },
+                        context: {
+                            page: {
+                                type: "HOMEPAGE",
+                                data: [""],
+                                location: "https://my-site.com",
+                                locale: "en_US"
+                            },
+                            pageAttributes: { is_night: "true" }
+                        },
+                        options: { isImplicitPageview: true }
+                    })
+                });
 
-  // Render the results in an HTML document
-  renderResultsInHTML(data);
-});
+                const data = await response.json();
+                displayData(data);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
 
-function renderResultsInHTML(data) {
-  // Create the HTML content based on the received data
-  const htmlContent = `
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>API Results</title>
-    </head>
-    <body>
-        <h1>API Results</h1>
-        <pre>${JSON.stringify(data, null, 2)}</pre>
-    </body>
-    </html>
-  `;
+        // Function to display the data on the page
+        function displayData(data) {
+            const dataDiv = document.getElementById('data');
+            // Update the HTML content with the API data
+            dataDiv.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+        }
 
-  // Save the HTML content to a file (e.g., results.html)
-  const fs = require('fs');
-  fs.writeFileSync('results.html', htmlContent);
-
-  console.log('HTML document generated: results.html');
-}
-
+        // Fetch data from the API when the page loads
+        fetchDataFromAPI();
+    </script>
+</body>
+</html>
